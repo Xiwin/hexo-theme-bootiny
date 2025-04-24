@@ -1,0 +1,9 @@
+<div class="overflow-auto" style="max-height: 90vh;">
+  <% if (page.toc != false) { %>
+  <div id="toc">
+    <strong class="sidebar-title">目录</strong>
+    <%- toc(page.content, {class: 'toc', list_number : false}) %>
+  </div>
+  <% } %>
+
+</div>

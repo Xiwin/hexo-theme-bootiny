@@ -1,0 +1,40 @@
+  <div class="container text-center rounded-4 p-2 shadow-lg sticky-top mb-2 blur" style="top: 70px">
+    <div class=" d-flex d-flex justify-content-center align-items-center">
+      <img src="<%= theme.profile_header %>" alt="" class="header-profle ">
+    </div>
+
+    <span class="profile-author mb-2"> <%= config.author %></span>
+
+    <div class="row mb-2 justify-content-around row-cols-3 gx-0">
+      <div class="col">
+        <span class="data-title">文章</span>
+        <p>
+          <%= site.posts.length %>
+        </p>
+      </div>
+      <div class="col">
+        <span class="data-title">分类</span>
+        <p>
+          <%= site.categories.length %>
+        </p>
+      </div>
+      <div class="col">
+        <span class="data-title">标签</span>
+        <p>
+          <%= site.tags.length %>
+        </p>
+      </div>
+    </div>
+
+    <div class="d-flex justify-content-center">
+      <a href="<%= theme.gitea %>" class="profile-icon">
+        <i class="bi bi-git"></i>
+      </a>
+      <a href="<%= theme.github %>" class="profile-icon">
+        <i class="bi bi-github"></i>
+      </a>
+      <a href="mailto:<%= theme.email %>" class="profile-icon">
+        <i class="bi bi-envelope-fill"></i>
+      </a>
+    </div>
+  </div>

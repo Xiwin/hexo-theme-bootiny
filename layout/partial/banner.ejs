@@ -1,0 +1,41 @@
+<div id="banner">
+  <div class="container-fluid d-flex justify-content-center align-items-center">
+    <div class="banner-box">
+      <h1 class="banner-text">
+        Welcome to <%= config.title %>
+        <br>
+        My dream is around the world with my wife.
+      </h1>
+      <h1 class="eraser-banner">
+        <span class="eraser-banner-text">
+          Welcome to <%= config.title %>
+          <br>
+          My dream is around the world with my wife.
+        </span>
+      </h1>
+    </div>
+  </div>
+</div>
+
+<!-- <script>
+  const banner = document.querySelector('#banner');
+
+  const bannerObs = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) {
+          // 当 banner 完全不可见时隐藏它
+          banner.style.display = 'none';
+        } else {
+          // 当 banner 再次可见时显示它
+          banner.style.display = 'block';
+        }
+      });
+    }, {
+      root: null, // 视口为根元素
+      threshold: 0, // 当 banner 完全不可见时触发
+    }
+  );
+
+  bannerObs.observe(banner);
+</script> -->

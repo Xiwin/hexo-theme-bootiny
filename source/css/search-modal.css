@@ -1,0 +1,36 @@
+/* 默认隐藏模态框 */
+#searchModal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  /* 半透明背景 */
+  z-index: 1000;
+  justify-content: center;
+  align-items: flex-start;
+  /* 从顶部开始 */
+  overflow: hidden;
+}
+
+/* 模态框内容 */
+#searchModal .modal-dialog {
+  transform: translateY(-100%);
+  /* 初始位置在视图外 */
+  transition: transform 0.3s ease-in-out;
+  /* 平滑动画 */
+}
+
+/* 打开动画 */
+#searchModal.slide-in .modal-dialog {
+  transform: translateY(0);
+  /* 移动到视图内 */
+}
+
+/* 关闭动画 */
+#searchModal.slide-out .modal-dialog {
+  transform: translateY(-100%);
+  /* 移动到视图外 */
+}

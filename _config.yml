@@ -1,0 +1,22 @@
+author: "shawing"
+profile_header: "/img/profile_header.png"
+
+index_max_post: 10
+
+favicon: "/img/favicon.ico"
+
+picjs: "/js/pic.min.js"
+
+gitea: "https://hub.xoneki.cn/"
+email: "xiaosir2022@gmail.com"
+github: "https://github.com/Xiwin/"
+
+toc:
+  maxdepth: 4
+  class: toc
+  slugify: transliteration
+  decodeEntities: false
+  anchor:
+    position: after
+    symbol: '####'
+    style: header-anchor
