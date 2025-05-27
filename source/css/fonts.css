@@ -1,0 +1,5 @@
+/* 字体 */
+@font-face {
+    font-family: "profile-author-font";
+    src: url("/font/BigShouldersStencil-Black.ttf");
+}

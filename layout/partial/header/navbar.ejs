@@ -1,0 +1,67 @@
+<nav id="header" class="navbar navbar-expand-lg rounded-4 shadow-lg p-2 my-3 blur">
+  <div class="container-fluid d-flex align-items-center justify-content-between">
+    <!-- 左侧内容 -->
+    <div id="navbar-left" class="d-flex align-items-center">
+      <%- partial('partial/header/left') %>
+    </div>
+
+    <!-- 中间内容 -->
+    <div id="navbar-center" class="d-flex justify-content-center flex-grow-1 text-center">
+      <!-- 默认留空，动态添加内容 -->
+    </div>
+
+    <!-- 右侧内容 -->
+    <div id="navbar-right" class="d-flex align-items-center">
+      <%- partial('partial/header/right') %>
+    </div>
+  </div>
+</nav>
+<!-- 移动端侧边栏菜单 -->
+<div class="offcanvas offcanvas-start" tabindex="-1" id="mobileMenu" aria-labelledby="mobileMenuLabel" style="max-width: 60vw;">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="mobileMenuLabel">导航</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    <ul class="navbar-nav">
+      <%- partial('partial/navmenus') %>
+    </ul>
+  </div>
+</div>
+
+<script>
+  const light = document.getElementById('light');
+  const dark = document.getElementById('dark');
+  const htmlTheme = document.querySelector('html');
+  const themeBtn = document.querySelector('#theme');
+
+  // 初始化主题
+  function setTheme() {
+    const theme = localStorage.getItem('theme') || 'light'; // 默认主题为 light
+
+    if (theme === 'dark') {
+      htmlTheme.dataset.bsTheme = 'dark';
+      light.hidden = true;
+      dark.hidden = false;
+    } else {
+      htmlTheme.dataset.bsTheme = 'light';
+      light.hidden = false;
+      dark.hidden = true;
+    }
+  }
+
+  // 切换主题
+  function toggleTheme() {
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+    localStorage.setItem('theme', newTheme); // 更新 localStorage 中的主题
+    setTheme(); // 更新页面主题
+  }
+
+  // 初始化主题
+  setTheme();
+
+  // 添加点击事件监听器
+  themeBtn.addEventListener('click', toggleTheme);
+</script>

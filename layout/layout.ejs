@@ -13,7 +13,7 @@
 
   var title = title = config.title;
   if (is_archive()){
-    title = 'All Posts - ' + config.author;
+    title = '全部文章' + config.author;
   } else if (is_post()){
     title = page.title;
   } else if (is_page()){
@@ -28,11 +28,6 @@
 
   <!-- 自定义CSS样式 -->
   <%- css('css/custom') %>
-  <%- css('css/prism-dark') %>
-  <%- css('css/prism-line-numbers') %>
-  <%- css('css/search-modal') %>
-  <%- css('css/toc') %>
-  <%- css('css/banner') %>
 
   <!-- FancyBox 图片模态框 -->
   <% if (is_post()) { %>
@@ -43,9 +38,17 @@
   <!-- Bootstrap5 CDN样式 -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
 
+  <!-- Bootstrap5 Icon -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
 
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+  <!-- 粒子效果JS -->
+  <% if (theme.particles && theme.particles.enabled) { %>
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+  <% } %>
 
   <!-- 搜索框JS -->
   <% if(config.search){ %>
@@ -55,76 +58,51 @@
 </head>
 
 <body>
-  <% if ( url == `${config.url}/index.html`) { %>
+  <!-- 横幅 -->
   <%- partial('partial/banner') %>
-  <% } %>
 
-  <header id="header" class="sticky-top">
-    <%- partial('partial/navbar', {cache: true}) %>
+  <!-- 导航栏 -->
+  <header>
+    <%- partial('partial/header/navbar') %>
   </header>
 
-  <canvas id="wallpaper"></canvas>
+  <!-- 主题壁纸 -->
+  <%- partial('partial/particless') %>
 
-
-  <div class="container-fluid justify-content-around">
+  <!-- 内容 -->
+  <div class=" container-fluid justify-content-around p-2">
     <div class="row justify-content-center gx-2">
-      <!-- 左侧边框 -->
+
+      <!-- 个性化侧边框 -->
       <div class="col-xl-2 d-none d-lg-none d-xxl-block">
-        <%- partial('partial/profile', {cache: true}) %>
-        <!-- <%- partial('partial/footer') %> -->
+        <%- partial('partial/sidebar/lsb') %>
       </div>
 
       <!-- 主体部分 -->
-      <div class="col-xxl-6 col-xl-8 col-12">
-        <div class="rounded-4 p-4 shadow-lg blur">
+      <div class="col-xl-8 col-12 col-xxl-6">
+        <div class="container rounded-4 p-4 shadow-lg blur">
           <%- body %>
         </div>
       </div>
 
       <!-- 右侧边框 -->
-      <div class="col-xl-2 d-lg-none d-none d-xl-block">
-        <div class="rounded-4 p-2 shadow-lg sticky-top blur" style="top: 70px">
-          <% if (is_post()) { %>
-          <%- partial('partial/toc') %>
-          <% } else { %>
-          <%- partial('partial/sidebar') %>
-          <% } %>
-        </div>
+      <div class="col-xl-2 d-none d-lg-none d-xl-block">
+        <%- partial('partial/sidebar/rsb') %>
       </div>
     </div>
   </div>
 
-  <script src="/js/canvas.js"></script>
 
-  <div id="searchModal" class="modal" tabindex="-1">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Search</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <div class="input-group mb-3">
-            <input type="text" id="search-text" class="form-control" placeholder="关键词，文章名，分类" aria-label="Recipient's username" aria-describedby="button-addon2">
-            <button class="btn btn-outline-secondary" type="button" id="button-addon2">Search</button>
-          </div>
-        </div>
-        <div class="modal-footer d-flex justify-content-start">
-          <ul id="searchResult">
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
+  <!-- 搜索拟态框 -->
+  <%- partial('partial/search') %>
 
-  <%- js('js/modal.js') %>
-
-
+  <!-- 页脚 -->
   <footer>
-    <%- partial('partial/footer') %>
+    <%- partial('partial/footer/footer') %>
   </footer>
+
   <% if (is_post()) { %>
-  <%- partial('partial/backtop') %>
+  <%- partial('partial/widget_overlay/widget_overlay') %>
   <script src="/js/gtop.js"></script>
   <% } %>
 

@@ -1,34 +1,35 @@
-<div id="banner">
+<div id="banner" class="z-n1">
   <div class="container-fluid d-flex justify-content-center align-items-center">
     <div class="banner-box">
       <h1 class="banner-text">
-        Welcome to <%= config.title %>
+        <%= config.subtitle %>
         <br>
-        My dream is around the world with my wife.
+        <%= config.description %>
       </h1>
       <h1 class="eraser-banner">
         <span class="eraser-banner-text">
-          Welcome to <%= config.title %>
+          <%= config.subtitle %>
           <br>
-          My dream is around the world with my wife.
+          <%= config.description %>
         </span>
       </h1>
     </div>
   </div>
 </div>
 
-<!-- <script>
+<script>
   const banner = document.querySelector('#banner');
+  const navbar = document.querySelector('#header');
 
   const bannerObs = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
-        if (!entry.isIntersecting) {
-          // 当 banner 完全不可见时隐藏它
-          banner.style.display = 'none';
+        if (entry.isIntersecting) {
+          // 当 banner 可见时，将 navbar 中的字体颜色设置为 白色
+          header.dataset['bsTheme'] = 'dark';
         } else {
-          // 当 banner 再次可见时显示它
-          banner.style.display = 'block';
+          // 当 banner 不可见时，将 navbar 中的字体颜色设置为 黑色
+          header.dataset['bsTheme'] = localStorage.getItem('theme');
         }
       });
     }, {
@@ -38,4 +39,4 @@
   );
 
   bannerObs.observe(banner);
-</script> -->
+</script>

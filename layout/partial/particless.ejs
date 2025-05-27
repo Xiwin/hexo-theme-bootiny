@@ -1,0 +1,11 @@
+<% if (theme.particles && theme.particles.enabled) { %>
+
+<div id="particles-js" class="wallpaper"></div>
+
+<script>
+  particlesJS.load('particles-js', '<%= theme.particles.conf_path  %>', () => {
+    console.log('callback - particles.js config loaded');
+  })
+</script>
+
+<% } %>

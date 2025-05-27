@@ -1,3 +1,13 @@
-<h2><%- page.title %></h2>
+<!-- 如果标题名为 page.title tags，那么就插入标签云 -->
+<% if (page.title == 'tags') { %>
+<!-- 标签云 -->
+<div class="tag-cloud text-center">
+  <%- tagcloud() %>
+</div>
+<% } else { %>
 
-<%- page.content%>
+<%- page.content %>
+
+<% } %>
+
+<!-- 用户自己创建的页面 -->

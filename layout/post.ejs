@@ -1,17 +1,55 @@
-<h2 class="text-center"><%- page.title %></h2>
+<h2 id="title" class="text-center"><%- page.title %></h2>
 
-<div class="d-flex my-3">
+<div class="d-flex mb-1 mt-3">
   <span class="badge rounded-pill text-bg-primary">
     发布时间：<%= page.date.startOf('day').fromNow(); %>
   </span>
 
   <span class="badge rounded-pill text-bg-warning">
-
     更新时间：<%= page.updated.startOf('day').fromNow(); %>
   </span>
 </div>
 
 
-<div class="content-container">
+<div class="d-flex mb-3">
+  <div class="ms-atuo">
+    <% page.tags.forEach((post_tag) => { %>
+    <span class="badge rounded-pill text-bg-secondary">
+      <%= post_tag.name %>
+    </span>
+    <% }); %>
+  </div>
+</div>
+
+<div id="post-body" class="content-container">
   <%- page.content %>
 </div>
+
+<%- partial('partial/comment') %>
+
+<script>
+  const pageContent = document.querySelector('.content-container');
+  const images = pageContent.querySelectorAll('img');
+  const title = $('#title');
+
+  images.forEach((img) => {
+    // 添加 data-fancybox 和 class="fancybox" 属性
+    img.setAttribute('data-fancybox', '');
+    img.classList.add('img-fluid');
+  });
+
+  const titleObs = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          // 当标题可见时，将标题从导航栏中移除
+        } else {
+          // 当标题不可见时，将标题添加到导航栏中
+        }
+      });
+    }, {
+      root: null, // 视口为根元素
+      threshold: 0, // 当标题完全不可见时触发
+    }
+  );
+</script>

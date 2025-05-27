@@ -1,0 +1,15 @@
+<div class="border-bottom border-light text-center mb-3 p-2">
+  <div class="d-flex">
+    <i class="bi bi-bookmark"></i>
+    <span>分类</span>
+  </div>
+</div>
+
+<div class="list-group">
+  <% site.categories.forEach(function (category) { %>
+  <a href="<%= url_for(category.path) %>" class="list-group-item list-group-item-action">
+    <%= category.name %>
+    <span class="badge bg-primary rounded-pill float-end"><%= category.length %></span>
+  </a>
+  <% }); %>
+</div>

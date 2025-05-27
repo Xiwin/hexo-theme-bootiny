@@ -1,7 +1,8 @@
+<%- partial('partial/pagination', {type: 'page'}) %>
+
 <% page.posts.each(function(post) { %>
 <article>
   <div class="row">
-
     <div class="three columns left lit">
       <p class="bottom"><%- full_date(post.date, 'll') %></p>
     </div>
@@ -17,5 +18,3 @@
   </div>
 </article>
 <% }) %>
-
-<%- partial('partial/pagination', {type: 'page'}) %>
