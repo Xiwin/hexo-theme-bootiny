@@ -2,7 +2,7 @@
 
 <div style="max-width: 100%;">
   <% page.posts.forEach((post)=>{ %>
-  <div class="border border-primary-subtle rounded-3 shadow-sm m-2" style="height: 50px;">
+  <div class="border rounded-3 shadow-sm m-2" style="height: 50px;">
     <a href="<%= url_for(post.path) %>" class="text-decoration-none">
       <%= post.title %>
     </a>
