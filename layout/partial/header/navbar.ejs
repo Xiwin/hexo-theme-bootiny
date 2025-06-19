@@ -1,22 +1,20 @@
 <nav id="header" class="navbar navbar-expand-lg rounded-4 shadow-lg p-2 my-3 blur">
   <div class="container-fluid d-flex align-items-center justify-content-between">
-    <!-- 左侧内容 -->
-    <div id="navbar-left" class="d-flex align-items-center">
-      <%- partial('partial/header/left') %>
-    </div>
+    <div class="row row-cols-xxl-3 row-cols-auto justify-content-around w-100">
+      <div id="navbar-left" class="col d-flex">
+        <%- partial('partial/header/left') %>
+      </div>
+      <div id="navbar-center" class="col d-flex justify-content-center">
 
-    <!-- 中间内容 -->
-    <div id="navbar-center" class="d-flex justify-content-center flex-grow-1 text-center">
-      <!-- 默认留空，动态添加内容 -->
-    </div>
-
-    <!-- 右侧内容 -->
-    <div id="navbar-right" class="d-flex align-items-center">
-      <%- partial('partial/header/right') %>
+      </div>
+      <div id="navbar-right" class="col d-flex justify-content-end">
+        <%- partial('partial/header/right') %>
+      </div>
     </div>
   </div>
 </nav>
-<!-- 移动端侧边栏菜单 -->
+
+<!-- 移动端侧边栏 -->
 <div class="offcanvas offcanvas-start" tabindex="-1" id="mobileMenu" aria-labelledby="mobileMenuLabel" style="max-width: 60vw;">
   <div class="offcanvas-header">
     <h5 class="offcanvas-title" id="mobileMenuLabel">导航</h5>
@@ -24,7 +22,7 @@
   </div>
   <div class="offcanvas-body">
     <ul class="navbar-nav">
-      <%- partial('partial/navmenus') %>
+      <%- partial('partial/header/navmenu') %>
     </ul>
   </div>
 </div>

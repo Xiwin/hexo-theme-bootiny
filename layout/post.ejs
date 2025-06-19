@@ -10,7 +10,6 @@
   </span>
 </div>
 
-
 <div class="d-flex mb-3">
   <div class="ms-atuo">
     <% page.tags.forEach((post_tag) => { %>
@@ -30,10 +29,10 @@
 <script>
   const pageContent = document.querySelector('.content-container');
   const images = pageContent.querySelectorAll('img');
-  const title = $('#title');
+  const navTitle = document.querySelector('#navbar-center');
 
   images.forEach((img) => {
-    // 添加 data-fancybox 和 class="fancybox" 属性
+    // 添加 data-fancybox 和 class="img-fluid" 属性
     img.setAttribute('data-fancybox', '');
     img.classList.add('img-fluid');
   });
@@ -41,10 +40,14 @@
   const titleObs = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
+
+        const title = docment.querySelector('#title');
         if (entry.isIntersecting) {
-          // 当标题可见时，将标题从导航栏中移除
+          // 当标题可见时，更新导航栏标题
+          navTitle.text(title.text() + ' - Bootiny');
         } else {
-          // 当标题不可见时，将标题添加到导航栏中
+          // 当标题不可见时，更新导航栏标题
+          navTitle.text(title.text());
         }
       });
     }, {

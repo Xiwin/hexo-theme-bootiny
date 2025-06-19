@@ -59,7 +59,7 @@
 
 <body>
   <!-- 横幅 -->
-  <%- partial('partial/banner') %>
+  <!-- partial('partial/banner') %> -->
 
   <!-- 导航栏 -->
   <header>
@@ -69,14 +69,17 @@
   <!-- 主题壁纸 -->
   <%- partial('partial/particless') %>
 
+  <div class="container" style="height: 90px;">
+
+  </div>
+
   <!-- 内容 -->
   <div class=" container-fluid justify-content-around p-2">
     <div class="row justify-content-center gx-2">
-
       <!-- 个性化侧边框 -->
-      <div class="col-xl-2 d-none d-lg-none d-xxl-block">
-        <%- partial('partial/sidebar/lsb') %>
-      </div>
+      <aside class="col-xl-2 d-none d-lg-none d-xxl-block">
+        <%- partial('partial/aside/lsb') %>
+      </aside>
 
       <!-- 主体部分 -->
       <div class="col-xl-8 col-12 col-xxl-6">
@@ -86,9 +89,9 @@
       </div>
 
       <!-- 右侧边框 -->
-      <div class="col-xl-2 d-none d-lg-none d-xl-block">
-        <%- partial('partial/sidebar/rsb') %>
-      </div>
+      <aside class="col-xl-2 d-none d-lg-none d-xl-block">
+        <%- partial('partial/aside/rsb') %>
+      </aside>
     </div>
   </div>
 

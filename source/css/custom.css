@@ -36,8 +36,6 @@
   font-size: 20px;
 }
 
-
-
 .profile-author {
   font-family: profile-author-font;
   display: block;
@@ -149,4 +147,15 @@
 footer a {
   text-decoration: none;
   color: #ccc;
+}
+
+#search-pop-btn {
+  z-index: 1001;
+  /* 确保按钮在最上层 */
+  transition: all 0.2s ease-in-out;
+}
+
+#search-pop-btn:hover {
+  transform: scale(0.95);
+  cursor: pointer;
 }
