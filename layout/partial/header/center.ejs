@@ -1,4 +1,138 @@
-<div style="width: 100%;">
-
-
+<div id="navbar-center-content" class="navbar-title-container">
+  <span id="navbar-title" class="navbar-title-text d-none d-md-block"></span>
 </div>
+
+<script>
+  $(document).ready(function() {
+    console.log('NavBar Title Script Loaded with jQuery');
+
+    // 获取DOM元素
+    const $header = $('#header');
+    const $navbarCenterContent = $('#navbar-center-content');
+    const $navbarTitle = $('#navbar-title');
+    const $postTitle = $('#title');
+    const $body = $('body');
+
+    // 检查是否为文章页面
+    if ($postTitle.length === 0) {
+      console.log('Not a post page, exiting');
+      return;
+    }
+
+    // 检查屏幕宽度，移动端优化
+    const isMobile = window.innerWidth < 768;
+    const isTablet = window.innerWidth < 992;
+
+    if (isMobile) {
+      console.log('Mobile device detected, disabling navbar title');
+      return; // 在移动端禁用此功能以优化性能
+    }
+
+    console.log('Elements found:', {
+      header: $header.length > 0,
+      navbarCenterContent: $navbarCenterContent.length > 0,
+      navbarTitle: $navbarTitle.length > 0,
+      postTitle: $postTitle.length > 0,
+      isMobile: isMobile,
+      isTablet: isTablet
+    });
+
+    let isNavbarTitleVisible = false;
+
+    // 创建Intersection Observer
+    const observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        const shouldShowNavbarTitle = !entry.isIntersecting;
+
+        console.log('Intersection Observer:', {
+          isIntersecting: entry.isIntersecting,
+          shouldShow: shouldShowNavbarTitle,
+          isVisible: isNavbarTitleVisible
+        });
+
+        if (shouldShowNavbarTitle && !isNavbarTitleVisible) {
+          showNavbarTitle();
+        } else if (!shouldShowNavbarTitle && isNavbarTitleVisible) {
+          hideNavbarTitle();
+        }
+      });
+    }, {
+      root: null,
+      rootMargin: '-80px 0px 0px 0px', // 导航栏高度的负边距
+      threshold: 0
+    });
+
+    // 开始观察文章标题
+    observer.observe($postTitle[0]);
+
+    function showNavbarTitle() {
+      console.log('Showing navbar title');
+      isNavbarTitleVisible = true;
+
+      // 设置标题内容
+      $navbarTitle.text($postTitle.text());
+
+      // 获取当前主题
+      const currentTheme = $('html').attr('data-bs-theme') || 'dark';
+
+      // 添加实心背景类和标题显示类
+      $header.removeClass('blur').addClass('navbar-solid show-title');
+
+      // 根据主题设置相应的类
+      if (currentTheme === 'dark') {
+        $header.addClass('navbar-dark');
+      } else {
+        $header.addClass('navbar-light');
+      }
+
+      // 显示标题（使用jQuery动画）
+      $navbarCenterContent.addClass('show').stop().animate({
+        opacity: 1
+      }, 300).css('transform', 'translateY(0)');
+    }
+
+    function hideNavbarTitle() {
+      console.log('Hiding navbar title');
+      isNavbarTitleVisible = false;
+
+      // 隐藏标题（使用jQuery动画）
+      $navbarCenterContent.removeClass('show').stop().animate({
+        opacity: 0
+      }, 300, function() {
+        // 动画完成后恢复模糊效果
+        $header.removeClass('navbar-solid navbar-dark navbar-light show-title').addClass('blur');
+      }).css('transform', 'translateY(-10px)');
+    }
+
+    // 监听主题变化
+    const observer_theme = new MutationObserver(function(mutations) {
+      mutations.forEach(function(mutation) {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'data-bs-theme') {
+          if (isNavbarTitleVisible) {
+            const currentTheme = $('html').attr('data-bs-theme') || 'light';
+            $header.removeClass('navbar-dark navbar-light');
+            if (currentTheme === 'dark') {
+              $header.addClass('navbar-dark');
+            } else {
+              $header.addClass('navbar-light');
+            }
+          }
+        }
+      });
+    });
+
+    observer_theme.observe($('html')[0], {
+      attributes: true
+    });
+
+    // 页面卸载时清理Observer
+    $(window).on('beforeunload', function() {
+      if (observer) {
+        observer.disconnect();
+      }
+      if (observer_theme) {
+        observer_theme.disconnect();
+      }
+    });
+  });
+</script>

@@ -25,6 +25,13 @@
 
   <title><%= title %></title>
   <meta name="author" content="<%- config.author %>">
+  <% if (is_post()) { %>
+  <meta name="description" content="<%- strip_html(page.excerpt || page.content).substring(0, 150) %>">
+  <% } else if (is_page()) { %>
+  <meta name="description" content="<%- strip_html(page.content).substring(0, 150) %>">
+  <% } else { %>
+  <meta name="description" content="<%- config.description %>">
+  <% } %>
 
   <!-- 自定义CSS样式 -->
   <%- css('css/custom') %>

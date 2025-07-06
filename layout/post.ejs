@@ -11,7 +11,7 @@
 </div>
 
 <div class="d-flex mb-3">
-  <div class="ms-atuo">
+  <div class="ms-auto">
     <% page.tags.forEach((post_tag) => { %>
     <span class="badge rounded-pill text-bg-secondary">
       <%= post_tag.name %>
@@ -20,39 +20,22 @@
   </div>
 </div>
 
-<div id="post-body" class="content-container">
+<div id="post-body" class="post-content">
   <%- page.content %>
 </div>
 
 <%- partial('partial/comment') %>
 
 <script>
-  const pageContent = document.querySelector('.content-container');
-  const images = pageContent.querySelectorAll('img');
-  const navTitle = document.querySelector('#navbar-center');
+  $(document).ready(function() {
+    const $pageContent = $('.post-content');
+    const $images = $pageContent.find('img');
 
-  images.forEach((img) => {
-    // 添加 data-fancybox 和 class="img-fluid" 属性
-    img.setAttribute('data-fancybox', '');
-    img.classList.add('img-fluid');
+    // 为图片添加 FancyBox 和响应式类
+    $images.each(function() {
+      const $img = $(this);
+      $img.attr('data-fancybox', '');
+      $img.addClass('img-fluid');
+    });
   });
-
-  const titleObs = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-
-        const title = docment.querySelector('#title');
-        if (entry.isIntersecting) {
-          // 当标题可见时，更新导航栏标题
-          navTitle.text(title.text() + ' - Bootiny');
-        } else {
-          // 当标题不可见时，更新导航栏标题
-          navTitle.text(title.text());
-        }
-      });
-    }, {
-      root: null, // 视口为根元素
-      threshold: 0, // 当标题完全不可见时触发
-    }
-  );
 </script>
