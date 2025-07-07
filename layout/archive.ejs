@@ -1,20 +1,153 @@
-<%- partial('partial/pagination', {type: 'page'}) %>
+<div class="archive-container">
+  <!-- 归档头部 -->
+  <div class="archive-header mb-4">
+    <h1 class="archive-title">
+      <i class="bi bi-archive-fill me-2"></i>
+      文章归档
+      <span class="text-muted fs-6">（共 <%= site.posts.length %> 篇文章）</span>
+    </h1>
+  </div>
 
-<% page.posts.each(function(post) { %>
-<article>
-  <div class="row">
-    <div class="three columns left lit">
-      <p class="bottom"><%- full_date(post.date, 'll') %></p>
-    </div>
-    <div class="nine columns left mb-3">
-      <a href="<%- url_for(post.path) %>" class="">
-        <% if (post.title == "") { %>
-        no title
-        <% } else { %>
-        <%- post.title %>
-        <% } %>
-      </a>
+  <!-- 时间轴容器 -->
+  <div class="timeline-container">
+    <div class="timeline-wrapper">
+      <%
+        // 按年份分组文章
+        const postsByYear = {};
+        page.posts.each(function(post) {
+          const year = post.date.format('YYYY');
+          if (!postsByYear[year]) {
+            postsByYear[year] = [];
+          }
+          postsByYear[year].push(post);
+        });
+        
+        // 获取年份列表并排序
+        const years = Object.keys(postsByYear).sort((a, b) => b - a);
+      %>
+
+      <% years.forEach(function(year, yearIndex) { %>
+      <div class="timeline-year-section" data-year="<%= year %>">
+        <!-- 年份标题 -->
+        <div class="timeline-year-header">
+          <div class="timeline-year-marker">
+            <div class="timeline-year-dot"></div>
+            <div class="timeline-year-line"></div>
+          </div>
+          <div class="timeline-year-content">
+            <h2 class="year-title">
+              <%= year %> 年
+              <span class="year-count">（<%= postsByYear[year].length %> 篇）</span>
+            </h2>
+          </div>
+        </div>
+
+        <!-- 该年份的文章列表 -->
+        <div class="timeline-posts">
+          <% postsByYear[year].forEach(function(post, postIndex) { %>
+          <article class="timeline-item" data-aos="fade-up" data-aos-delay="<%= postIndex * 100 %>">
+            <div class="timeline-marker">
+              <div class="timeline-dot"></div>
+              <% if (postIndex < postsByYear[year].length - 1) { %>
+              <div class="timeline-line"></div>
+              <% } %>
+            </div>
+
+            <div class="timeline-content">
+              <div class="timeline-card p-2">
+                <div class="card-header">
+                  <div class="post-date">
+                    <i class="bi bi-calendar3 me-1"></i>
+                    <%= post.date.format('MM-DD') %>
+                  </div>
+                  <div class="post-meta">
+                    <% if (post.categories && post.categories.length > 0) { %>
+                    <span class="post-category">
+                      <i class="bi bi-folder2 me-1"></i>
+                      <%= post.categories.first().name %>
+                    </span>
+                    <% } %>
+                  </div>
+                </div>
+
+                <div class="card-body">
+                  <h3 class="post-title">
+                    <a href="<%- url_for(post.path) %>" class="post-link">
+                      <% if (post.title && post.title.trim() !== "") { %>
+                      <%- post.title %>
+                      <% } else { %>
+                      无标题
+                      <% } %>
+                    </a>
+                  </h3>
+
+                  <% if (post.excerpt || post.description) { %>
+                  <div class="post-excerpt">
+                    <%- strip_html(post.excerpt || post.description).substring(0, 120) %>
+                    <% if ((post.excerpt || post.description).length > 120) { %>...
+                    <% } %>
+                  </div>
+                  <% } %>
+
+                  <div class="post-tags">
+                    <% if (post.tags && post.tags.length > 0) { %>
+                    <% post.tags.limit(3).each(function(tag) { %>
+                    <span class="post-tag">
+                      <i class="bi bi-tag-fill me-1"></i>
+                      <%= tag.name %>
+                    </span>
+                    <% }) %>
+                    <% } %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+          <% }) %>
+        </div>
+      </div>
+      <% }) %>
     </div>
   </div>
-</article>
-<% }) %>
+
+  <!-- 分页导航 -->
+  <div class="archive-pagination mt-5">
+    <%- partial('partial/pagination', {type: 'archive'}) %>
+  </div>
+</div>
+
+<!-- 时间轴动画脚本 -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // 添加滚动动画
+    const timelineItems = document.querySelectorAll('.timeline-item');
+
+    // 简单的滚动显示动画
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver(function(entries) {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate-in');
+        }
+      });
+    }, observerOptions);
+
+    timelineItems.forEach(item => {
+      observer.observe(item);
+    });
+
+    // 年份计数动画
+    const yearHeaders = document.querySelectorAll('.timeline-year-header');
+    yearHeaders.forEach(header => {
+      header.addEventListener('click', function() {
+        const section = this.closest('.timeline-year-section');
+        const posts = section.querySelector('.timeline-posts');
+        section.classList.toggle('collapsed');
+      });
+    });
+  });
+</script>

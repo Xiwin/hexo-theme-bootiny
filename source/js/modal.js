@@ -2,19 +2,26 @@ const elements = {
     overlay: document.querySelector('.search-pop-overlay'),
     modal: document.querySelector('.modal'),
     input: document.getElementById('search-text'),
-    btn: document.querySelector('#search-pop-btn')
+    btnDesktop: document.querySelector('#search-pop-btn'),
+    btnMobile: document.querySelector('#search-pop-btn-mobile')
 };
 
 const searchModal = {
     open() {
+        console.log('Opening search modal');
         elements.overlay.classList.add('search-active');
-        elements.input?.focus();
+        // 延迟聚焦，确保模态框完全显示后再聚焦
+        setTimeout(() => {
+            elements.input?.focus();
+        }, 100);
     },
     close() {
+        console.log('Closing search modal');
         elements.modal.classList.add('closing');
         setTimeout(() => {
             elements.overlay.classList.remove('search-active');
             elements.modal.classList.remove('closing');
+            elements.input?.blur(); // 确保失去焦点
         }, 300);
     }
 };
@@ -24,16 +31,49 @@ const handleKeydown = (e) => {
         e.preventDefault();
         searchModal.open();
     } else if (e.key === 'Escape') {
-        searchModal.close();
+        if (elements.overlay.classList.contains('search-active')) {
+            e.preventDefault();
+            searchModal.close();
+        }
     }
 };
 
 const handleOverlayClick = (e) => {
-    if (e.target.classList.contains('modal') || e.target.classList.contains('btn-close')) {
+    // 检查是否点击了模态框外部或关闭按钮
+    if (e.target.classList.contains('search-pop-overlay') ||
+        e.target.classList.contains('modal') ||
+        e.target.classList.contains('btn-close')) {
         searchModal.close();
     }
 };
 
-elements.btn.addEventListener('click', () => searchModal.open());
-elements.overlay.addEventListener('click', handleOverlayClick);
-document.addEventListener('keydown', handleKeydown);
+// 确保DOM加载完成后再绑定事件
+document.addEventListener('DOMContentLoaded', function () {
+    // 绑定桌面端搜索按钮
+    if (elements.btnDesktop) {
+        elements.btnDesktop.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Desktop search button clicked');
+            searchModal.open();
+        });
+    }
+
+    // 绑定移动端搜索按钮
+    if (elements.btnMobile) {
+        elements.btnMobile.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Mobile search button clicked');
+            searchModal.open();
+        });
+    }
+
+    // 绑定覆盖层点击事件
+    if (elements.overlay) {
+        elements.overlay.addEventListener('click', handleOverlayClick);
+    }
+
+    // 绑定键盘事件
+    document.addEventListener('keydown', handleKeydown);
+});

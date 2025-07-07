@@ -1,21 +1,109 @@
-<nav aria-label="...">
-  <ul class="pagination">
+<% if (page.total > 1) { %>
+<nav aria-label="分页导航" class="pagination-wrapper">
+  <ul class="pagination justify-content-center">
+    <!-- 上一页 -->
     <% if (page.prev) { %>
     <li class="page-item">
-      <% } else { %>
-    <li class="page-item disabled">
-      <% } %>
-      <a class="page-link" href="<%- url_for(page.prev_link) %>">上一页</a>
+      <a class="page-link" href="<%- url_for(page.prev_link) %>" aria-label="上一页">
+        <i class="bi bi-chevron-left me-1"></i>
+        上一页
+      </a>
     </li>
+    <% } else { %>
+    <li class="page-item disabled">
+      <span class="page-link">
+        <i class="bi bi-chevron-left me-1"></i>
+        上一页
+      </span>
+    </li>
+    <% } %>
 
-    <%- `<li class="page-item"><span class="page-link">第${page.current}/${page.total}页</span></li>` %>
+    <!-- 页码范围显示 -->
+    <%
+      // 计算显示的页码范围
+      const current = page.current;
+      const total = page.total;
+      const delta = 2; // 当前页前后显示的页数
+      const range = [];
+      const rangeWithDots = [];
+      
+      // 计算起始和结束页码
+      const start = Math.max(1, current - delta);
+      const end = Math.min(total, current + delta);
+      
+      // 构建基本范围
+      for (let i = start; i <= end; i++) {
+        range.push(i);
+      }
+      
+      // 添加首页
+      if (start > 1) {
+        rangeWithDots.push(1);
+        if (start > 2) {
+          rangeWithDots.push('...');
+        }
+      }
+      
+      // 添加中间范围
+      rangeWithDots.push(...range);
+      
+      // 添加末页
+      if (end < total) {
+        if (end < total - 1) {
+          rangeWithDots.push('...');
+        }
+        rangeWithDots.push(total);
+      }
+    %>
 
+    <!-- 渲染页码 -->
+    <% rangeWithDots.forEach(function(pageNum) { %>
+    <% if (pageNum === '...') { %>
+    <li class="page-item disabled">
+      <span class="page-link">...</span>
+    </li>
+    <% } else if (pageNum === current) { %>
+    <li class="page-item active" aria-current="page">
+      <span class="page-link">
+        <%= pageNum %>
+        <span class="visually-hidden">(当前页)</span>
+      </span>
+    </li>
+    <% } else { %>
+    <li class="page-item">
+      <a class="page-link" href="<%- url_for(page.base + 'page' + '/' + pageNum + '/') %>">
+        <%= pageNum %>
+      </a>
+    </li>
+    <% } %>
+    <% }) %>
+
+    <!-- 下一页 -->
     <% if (page.next) { %>
     <li class="page-item">
-      <% } else { %>
-    <li class="page-item disabled">
-      <% } %>
-      <a class="page-link" href="<%- url_for(page.next_link) %>">下一页</a>
+      <a class="page-link" href="<%- url_for(page.next_link) %>" aria-label="下一页">
+        下一页
+        <i class="bi bi-chevron-right ms-1"></i>
+      </a>
     </li>
+    <% } else { %>
+    <li class="page-item disabled">
+      <span class="page-link">
+        下一页
+        <i class="bi bi-chevron-right ms-1"></i>
+      </span>
+    </li>
+    <% } %>
   </ul>
+
+  <!-- 页面信息 -->
+  <div class="pagination-info text-center mt-3">
+    <small class="text-muted">
+      第 <%= page.current %> 页，共 <%= page.total %> 页
+      <% if (type === 'archive') { %>
+      （显示 <%= page.posts.length %> 篇文章）
+      <% } %>
+    </small>
+  </div>
 </nav>
+<% } %>
