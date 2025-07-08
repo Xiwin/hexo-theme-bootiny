@@ -1,13 +1,13 @@
 <nav id="header" class="navbar navbar-expand-lg rounded-4 shadow-lg p-2 my-3 blur">
-  <div class="container-fluid d-flex align-items-center justify-content-between">
-    <div class="row row-cols-xxl-3 row-cols-auto justify-content-around w-100">
-      <div id="navbar-left" class="col d-flex">
+  <div class="container-fluid">
+    <div class="navbar-grid w-100">
+      <div id="navbar-left" class="d-flex align-items-center">
         <%- partial('partial/header/left') %>
       </div>
-      <div id="navbar-center" class="col d-flex justify-content-center">
-
+      <div id="navbar-center" class="d-flex justify-content-center align-items-center">
+        <%- partial('partial/header/center') %>
       </div>
-      <div id="navbar-right" class="col d-flex justify-content-end">
+      <div id="navbar-right" class="d-flex align-items-center justify-content-end">
         <%- partial('partial/header/right') %>
       </div>
     </div>
@@ -35,7 +35,7 @@
 
   // 初始化主题
   function setTheme() {
-    const theme = localStorage.getItem('theme') || 'light'; // 默认主题为 light
+    const theme = localStorage.getItem('theme') || 'dark'; // 默认主题为 dark (与HTML中data-bs-theme="dark"保持一致)
 
     if (theme === 'dark') {
       htmlTheme.dataset.bsTheme = 'dark';
@@ -50,7 +50,7 @@
 
   // 切换主题
   function toggleTheme() {
-    const currentTheme = localStorage.getItem('theme') || 'light';
+    const currentTheme = localStorage.getItem('theme') || 'dark';
     const newTheme = currentTheme === 'light' ? 'dark' : 'light';
 
     localStorage.setItem('theme', newTheme); // 更新 localStorage 中的主题

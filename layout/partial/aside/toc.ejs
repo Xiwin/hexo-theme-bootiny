@@ -1,9 +1,477 @@
 <div class="overflow-auto" style="max-height: 90vh;">
   <% if (page.toc != false) { %>
-  <div id="toc">
-    <strong class="sidebar-title">目录</strong>
-    <%- toc(page.content, {class: 'toc', list_number : false}) %>
+  <div id="toc-container">
+    <div class="toc-header mb-3">
+      <i class="bi bi-list-ul me-2 text-primary"></i>
+      <strong class="fs-6">目录</strong>
+    </div>
+    <nav id="toc" class="toc-nav">
+      <%- toc(page.content, { 
+        list_number: false, 
+        class: 'toc-list nav flex-column',
+        max_depth: 4
+      }) %>
+    </nav>
   </div>
   <% } %>
-
 </div>
+
+<script>
+  $(document).ready(function() {
+    try {
+      const $tocContainer = $('#toc-container');
+      const $tocNav = $('#toc');
+
+      // 检查目录是否存在
+      if ($tocContainer.length === 0 || $tocNav.length === 0) {
+        console.log('TOC not found, skipping initialization');
+        return;
+      }
+
+      // 检查是否为移动设备
+      const isMobile = window.innerWidth < 1200; // xl breakpoint
+      if (isMobile) {
+        console.log('Mobile device, TOC will be hidden');
+        return;
+      }
+
+      // 获取所有标题元素 - 使用更安全的选择器
+      let headings = $('.post-content').find('h1, h2, h3, h4, h5, h6');
+
+      if (headings.length === 0) {
+        // 尝试备用选择器
+        const fallbackHeadings = $('#post-body').find('h1, h2, h3, h4, h5, h6');
+        if (fallbackHeadings.length === 0) {
+          console.log('No headings found, hiding TOC');
+          $tocContainer.hide();
+          return;
+        }
+        headings = fallbackHeadings;
+      }
+
+      console.log('Found', headings.length, 'headings');
+
+      // 创建标题ID与链接的映射关系
+      const headingMap = new Map();
+
+      // 获取所有目录链接
+      const $tocLinks = $tocNav.find('a').filter(function() {
+        return $(this).attr('href') && $(this).attr('href').startsWith('#');
+      });
+
+      if ($tocLinks.length === 0) {
+        console.log('No TOC links found');
+        return;
+      }
+
+      console.log('Found', $tocLinks.length, 'TOC links');
+
+      // 为标题和链接建立映射关系 - 改进版本
+      headings.each(function(index) {
+        const $heading = $(this);
+        const headingText = $heading.text().trim();
+        let headingId = $heading.attr('id');
+
+        // 先尝试找到对应的TOC链接
+        let matchedLink = null;
+        let matchedHref = null;
+
+        // 查找匹配的TOC链接
+        $tocLinks.each(function() {
+          const $link = $(this);
+          const linkText = $link.text().trim();
+          const linkHref = $link.attr('href');
+
+          if (linkText === headingText && linkHref && linkHref.startsWith('#')) {
+            matchedLink = $link;
+            matchedHref = linkHref;
+            return false; // 找到匹配后跳出循环
+          }
+        });
+
+        // 如果找到了匹配的链接
+        if (matchedLink && matchedHref) {
+          const linkId = decodeURIComponent(matchedHref.substring(1));
+
+          // 如果标题没有ID，设置为链接中的ID
+          if (!headingId) {
+            try {
+              $heading.attr('id', linkId);
+              headingId = linkId;
+            } catch (error) {
+              console.warn('Could not set ID:', linkId, error);
+              // 生成一个安全的ID
+              const safeId = 'heading-' + index;
+              $heading.attr('id', safeId);
+              headingId = safeId;
+            }
+          }
+
+          // 建立映射关系
+          headingMap.set(headingId, {
+            heading: $heading[0],
+            link: matchedLink,
+            text: headingText,
+            originalHref: matchedHref
+          });
+
+          console.log('Mapped:', headingText, '->', headingId, 'href:', matchedHref);
+        } else {
+          // 没有找到匹配的链接，为标题生成一个ID
+          if (!headingId) {
+            const safeId = 'heading-' + index;
+            $heading.attr('id', safeId);
+            headingId = safeId;
+          }
+          console.log('No TOC link found for heading:', headingText);
+        }
+      });
+
+      // 调试：输出所有找到的标题和链接
+      console.log('=== TOC Debug Info ===');
+      console.log('Total headings found:', headings.length);
+      console.log('Total TOC links found:', $tocLinks.length);
+
+      headings.each(function(index) {
+        const $heading = $(this);
+        console.log(`Heading ${index}:`, {
+          text: $heading.text().trim(),
+          id: $heading.attr('id'),
+          tag: $heading.prop('tagName')
+        });
+      });
+
+      $tocLinks.each(function(index) {
+        const $link = $(this);
+        const href = $link.attr('href');
+        console.log(`TOC Link ${index}:`, {
+          text: $link.text().trim(),
+          href: href,
+          decodedHref: href ? decodeURIComponent(href) : null
+        });
+      });
+
+      console.log('Established mappings:');
+      headingMap.forEach((value, key) => {
+        console.log(`  ${key} -> ${value.text} (${value.originalHref})`);
+      });
+      console.log('=== End Debug Info ===');
+
+      let activeHeading = null;
+
+      // Intersection Observer 配置
+      const observerOptions = {
+        root: null,
+        rootMargin: '-10% 0px -80% 0px', // 优化检测区域
+        threshold: 0.1
+      };
+
+      // 创建 Intersection Observer
+      const headingObserver = new IntersectionObserver(function(entries) {
+        let currentActiveHeading = null;
+        let maxIntersectionRatio = 0;
+
+        // 找到交集比例最大的标题
+        entries.forEach(entry => {
+          if (entry.isIntersecting && entry.intersectionRatio > maxIntersectionRatio) {
+            maxIntersectionRatio = entry.intersectionRatio;
+            currentActiveHeading = entry.target;
+          }
+        });
+
+        // 如果没有相交的标题，选择最靠近顶部的标题
+        if (!currentActiveHeading) {
+          let closestHeading = null;
+          let minDistance = Infinity;
+
+          headingMap.forEach((value, headingId) => {
+            const rect = value.heading.getBoundingClientRect();
+            const distance = Math.abs(rect.top - 100); // 考虑导航栏高度
+            if (distance < minDistance) {
+              minDistance = distance;
+              closestHeading = value.heading;
+            }
+          });
+
+          currentActiveHeading = closestHeading;
+        }
+
+        if (currentActiveHeading) {
+          const headingId = currentActiveHeading.getAttribute('id');
+          if (headingId) {
+            updateActiveTocItem(headingId);
+          }
+        }
+      }, observerOptions);
+
+      // 观察所有映射的标题
+      headingMap.forEach((value, headingId) => {
+        headingObserver.observe(value.heading);
+      });
+
+      // 更新活跃的目录项
+      function updateActiveTocItem(headingId) {
+        if (activeHeading === headingId) return;
+
+        activeHeading = headingId;
+
+        // 移除所有活跃状态
+        $tocLinks.removeClass('active');
+
+        // 添加当前活跃状态
+        const mappedItem = headingMap.get(headingId);
+        if (mappedItem && mappedItem.link) {
+          mappedItem.link.addClass('active');
+
+          // 确保活跃项在可视区域内
+          const tocScrollTop = $tocNav.scrollTop();
+          const tocHeight = $tocNav.height();
+          const linkTop = mappedItem.link.position().top;
+          const linkHeight = mappedItem.link.outerHeight();
+
+          if (linkTop < 0 || linkTop + linkHeight > tocHeight) {
+            $tocNav.animate({
+              scrollTop: tocScrollTop + linkTop - tocHeight / 2 + linkHeight / 2
+            }, 150); // 减少滚动动画时间
+          }
+        }
+      }
+
+      // 平滑滚动到对应章节 - 改进版本
+      $tocLinks.on('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const $clickedLink = $(this);
+        const targetHref = $clickedLink.attr('href');
+
+        if (!targetHref || !targetHref.startsWith('#')) {
+          console.log('Invalid href:', targetHref);
+          return;
+        }
+
+        // 解码URL
+        const targetId = decodeURIComponent(targetHref.substring(1));
+        console.log('Clicking TOC link, target ID:', targetId, 'original href:', targetHref);
+
+        // 多种方式查找目标元素
+        let $target = null;
+        let targetElement = null;
+
+        // 方法1: 通过映射查找
+        for (const [mappedId, mappedData] of headingMap) {
+          if (mappedData.originalHref === targetHref || mappedId === targetId) {
+            targetElement = mappedData.heading;
+            $target = $(targetElement);
+            console.log('Found target via mapping:', mappedId);
+            break;
+          }
+        }
+
+        // 方法2: 直接查找ID
+        if (!targetElement) {
+          $target = findElementByIdSafe(targetId);
+          if ($target && $target.length > 0) {
+            targetElement = $target[0];
+            console.log('Found target by ID search');
+          }
+        }
+
+        // 方法3: 通过文本匹配查找
+        if (!targetElement) {
+          const linkText = $clickedLink.text().trim();
+          headings.each(function() {
+            const $heading = $(this);
+            if ($heading.text().trim() === linkText) {
+              targetElement = this;
+              $target = $heading;
+              console.log('Found target by text matching:', linkText);
+              return false; // 跳出循环
+            }
+          });
+        }
+
+        if (targetElement && $target && $target.length > 0) {
+          console.log('Found target element, scrolling...');
+
+          // 确保目标元素有ID
+          let elementId = targetElement.getAttribute('id');
+          if (!elementId) {
+            elementId = targetId || 'auto-' + Date.now();
+            targetElement.setAttribute('id', elementId);
+          }
+
+          // 立即更新活跃状态
+          updateActiveTocItem(elementId);
+
+          // 计算滚动位置
+          const navbarHeight = $('#header').outerHeight() || 80;
+          const offsetTop = $target.offset().top - navbarHeight - 20;
+
+          // 快速平滑滚动
+          $('html, body').animate({
+            scrollTop: offsetTop
+          }, 200);
+
+        } else {
+          console.log('Target element not found for:', targetId, 'href:', targetHref);
+
+          // 最后的备用方案：使用原生scrollIntoView
+          try {
+            const nativeElement = document.querySelector(targetHref);
+            if (nativeElement) {
+              console.log('Using native scrollIntoView as fallback');
+              nativeElement.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+              });
+            } else {
+              console.log('Native querySelector also failed for:', targetHref);
+            }
+          } catch (error) {
+            console.warn('Native scrollIntoView failed:', error);
+          }
+        }
+      });
+
+      // 响应式处理
+      function handleResize() {
+        const windowWidth = $(window).width();
+
+        if (windowWidth < 1200) {
+          $tocContainer.addClass('d-none');
+        } else {
+          $tocContainer.removeClass('d-none');
+        }
+      }
+
+      $(window).on('resize', handleResize);
+      handleResize();
+
+      // 页面卸载时清理
+      $(window).on('beforeunload', function() {
+        if (headingObserver) {
+          headingObserver.disconnect();
+        }
+      });
+
+      // 安全的ID处理函数
+      function escapeSelector(id) {
+        // 转义CSS选择器中的特殊字符
+        return id.replace(/[!"#$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, '\\$&');
+      }
+
+      // 安全的元素查找函数 - 改进版本
+      function findElementByIdSafe(id) {
+        try {
+          // 方法1: 原生DOM API (最安全，支持所有字符)
+          const element = document.getElementById(id);
+          if (element) {
+            return $(element);
+          }
+
+          // 方法2: 尝试URL解码
+          try {
+            const decodedId = decodeURIComponent(id);
+            if (decodedId !== id) {
+              const decodedElement = document.getElementById(decodedId);
+              if (decodedElement) {
+                return $(decodedElement);
+              }
+            }
+          } catch (decodeError) {
+            console.warn('URL decode failed for ID:', id);
+          }
+
+          // 方法3: 属性选择器 (最兼容)
+          const $attrElement = $('[id="' + id.replace(/"/g, '\\"') + '"]');
+          if ($attrElement.length > 0) {
+            return $attrElement;
+          }
+
+          // 方法4: 尝试转义后的jQuery选择器 (备用)
+          try {
+            const escapedId = escapeSelector(id);
+            const $element = $('#' + escapedId);
+            if ($element.length > 0) {
+              return $element;
+            }
+          } catch (escapeError) {
+            console.warn('Escaped selector failed for ID:', id);
+          }
+
+          return null;
+        } catch (error) {
+          console.warn('Error finding element with ID:', id, error);
+          return null;
+        }
+      }
+
+    } catch (error) {
+      console.error('TOC initialization error:', error);
+      console.error('Error stack:', error.stack);
+
+      // 简化的备用方案 - 改进版本
+      try {
+        const $simpleLinks = $('#toc a[href^="#"]');
+        $simpleLinks.on('click', function(e) {
+          e.preventDefault();
+          const href = $(this).attr('href');
+          const linkText = $(this).text().trim();
+
+          if (href) {
+            console.log('Fallback handler - href:', href, 'text:', linkText);
+
+            // 尝试多种方式查找目标
+            let target = null;
+
+            // 方法1: 直接querySelector
+            try {
+              target = document.querySelector(href);
+            } catch (queryError) {
+              console.warn('querySelector failed for:', href);
+            }
+
+            // 方法2: 通过ID查找
+            if (!target) {
+              const id = decodeURIComponent(href.substring(1));
+              target = document.getElementById(id);
+            }
+
+            // 方法3: 通过文本匹配查找标题
+            if (!target) {
+              const allHeadings = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
+              for (const heading of allHeadings) {
+                if (heading.textContent.trim() === linkText) {
+                  target = heading;
+                  break;
+                }
+              }
+            }
+
+            if (target) {
+              console.log('Fallback found target, scrolling...');
+              // 使用原生scrollIntoView，更可靠
+              target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start',
+                inline: 'nearest'
+              });
+
+              // 调整滚动位置以考虑固定导航栏
+              setTimeout(() => {
+                const navbarHeight = document.querySelector('#header')?.offsetHeight || 80;
+                window.scrollBy(0, -navbarHeight - 20);
+              }, 100);
+            } else {
+              console.error('Fallback: Target not found for href:', href, 'text:', linkText);
+            }
+          }
+        });
+        console.log('Fallback TOC handler activated for', $simpleLinks.length, 'links');
+      } catch (fallbackError) {
+        console.error('Fallback TOC handler failed:', fallbackError);
+      }
+    }
+  });
+</script>

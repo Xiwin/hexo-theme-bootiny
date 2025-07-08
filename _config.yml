@@ -9,8 +9,8 @@ email: "xiaosir2022@gmail.com"
 github: "https://github.com/Xiwin/"
 
 particles: 
-  enabled: true# 是否启用粒子特效
-  conf_path: "/assets/particlesjs-config.json" # 填写souce目录下绝对路径
+  enabled: true # 是否启用粒子特效
+  conf_path: "/assets/particlesjs-config.json" # 填写source目录下绝对路径
 
 # 备案号
 icp: "渝ICP备2024039197号-1"

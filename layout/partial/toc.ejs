@@ -1,0 +1,136 @@
+<!-- 文章目录导航 -->
+<% if (is_post() && page.toc !== false) { %>
+<div id="toc-container" class="d-none d-xl-block">
+  <div class="toc-wrapper bg-body-secondary rounded-3 shadow-sm p-3">
+    <h6 class="toc-title mb-3">
+      <i class="bi bi-list-ul me-2"></i>目录
+    </h6>
+    <div id="toc-content" class="toc-content">
+      <%- toc(page.content, {list_number: false, class: 'toc-list', max_depth: 4}) %>
+    </div>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function() {
+    const $tocContainer = $('#toc-container');
+    const $tocContent = $('#toc-content');
+
+    if ($tocContainer.length === 0 || $tocContent.length === 0) {
+      console.log('TOC not found, skipping initialization');
+      return;
+    }
+
+    // 获取所有标题元素
+    const headings = $('.post-content h1, .post-content h2, .post-content h3, .post-content h4, .post-content h5, .post-content h6');
+
+    if (headings.length === 0) {
+      console.log('No headings found, hiding TOC');
+      $tocContainer.hide();
+      return;
+    }
+
+    // 为标题添加锚点ID（如果没有的话）
+    headings.each(function(index) {
+      const $heading = $(this);
+      if (!$heading.attr('id')) {
+        const id = 'heading-' + index;
+        $heading.attr('id', id);
+      }
+    });
+
+    // 获取目录链接
+    const $tocLinks = $tocContent.find('a[href^="#"]');
+
+    // 创建 Intersection Observer 来跟踪标题
+    const observerOptions = {
+      root: null,
+      rootMargin: '-20% 0px -70% 0px',
+      threshold: 0
+    };
+
+    let activeHeading = null;
+
+    const headingObserver = new IntersectionObserver(function(entries) {
+      // 找到当前可见的标题
+      const visibleHeadings = entries.filter(entry => entry.isIntersecting);
+
+      if (visibleHeadings.length > 0) {
+        // 选择第一个可见的标题
+        const currentHeading = visibleHeadings[0].target;
+        updateActiveTocItem(currentHeading.id);
+      }
+    }, observerOptions);
+
+    // 观察所有标题
+    headings.each(function() {
+      headingObserver.observe(this);
+    });
+
+    // 更新活跃的目录项
+    function updateActiveTocItem(headingId) {
+      if (activeHeading === headingId) return;
+
+      activeHeading = headingId;
+
+      // 移除所有活跃状态
+      $tocLinks.removeClass('active');
+      $tocLinks.parent().removeClass('active');
+
+      // 添加当前活跃状态
+      const $activeLink = $tocContent.find(`a[href="#${headingId}"]`);
+      if ($activeLink.length > 0) {
+        $activeLink.addClass('active');
+        $activeLink.parent().addClass('active');
+
+        // 滚动到可见区域
+        const tocTop = $tocContent.scrollTop();
+        const tocHeight = $tocContent.height();
+        const linkTop = $activeLink.position().top;
+
+        if (linkTop < 0 || linkTop > tocHeight - 40) {
+          $tocContent.animate({
+            scrollTop: tocTop + linkTop - tocHeight / 2
+          }, 200);
+        }
+      }
+    }
+
+    // 平滑滚动到锚点
+    $tocLinks.on('click', function(e) {
+      e.preventDefault();
+      const targetId = $(this).attr('href').substring(1);
+      const $target = $(`#${targetId}`);
+
+      if ($target.length > 0) {
+        const offsetTop = $target.offset().top - 100; // 考虑导航栏高度
+
+        $('html, body').animate({
+          scrollTop: offsetTop
+        }, 300);
+      }
+    });
+
+    // 响应式处理
+    function handleResize() {
+      const windowWidth = $(window).width();
+
+      if (windowWidth < 1200) {
+        $tocContainer.addClass('d-none');
+      } else {
+        $tocContainer.removeClass('d-none');
+      }
+    }
+
+    $(window).on('resize', handleResize);
+    handleResize();
+
+    // 页面卸载时清理
+    $(window).on('beforeunload', function() {
+      if (headingObserver) {
+        headingObserver.disconnect();
+      }
+    });
+  });
+</script>
+<% } %>

@@ -1,35 +1,197 @@
 .search-pop-overlay {
   background: rgba(0, 0, 0, 0);
-  height: 100%;
-  width: 100%;
+  height: 100vh;
+  width: 100vw;
   position: fixed;
   left: 0;
   top: 0;
-  z-index: 1000;
-  justify-content: center;
-  align-items: flex-start;
+  z-index: 1060;
+  /* 提高z-index，确保在offcanvas之上 */
+  justify-content: center !important;
+  /* 强制水平居中 */
+  align-items: center !important;
+  /* 强制垂直居中 */
   visibility: hidden;
-  display: flex;
+  display: flex !important;
   transition: background 0.3s ease;
+  pointer-events: none;
+  padding: 1rem;
+  /* 移动端适配 */
+  box-sizing: border-box;
 }
 
 .search-active {
   visibility: visible;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.6);
+  /* 稍微加深背景 */
+  pointer-events: auto;
 }
 
-.modal {
-  transform: scale(0);
+.search-pop-overlay .modal {
+  transform: scale(0.8) translateY(-30px);
   opacity: 0;
-  transition: transform 0.3s ease, opacity 0.3s ease;
+  transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease;
+  z-index: 1070;
+  /* 确保模态框在最顶层 */
+  margin: 0 !important;
+  /* 强制移除margin，使用flex居中 */
+  width: 100% !important;
+  height: 100% !important;
+  /* 占据全屏高度 */
+  max-width: none !important;
+  /* 移除最大宽度限制 */
+  display: flex !important;
+  /* 覆盖Bootstrap的display:block */
+  align-items: center !important;
+  justify-content: center !important;
+  position: fixed !important;
+  /* 确保占据全屏 */
+  top: 0 !important;
+  left: 0 !important;
 }
 
 .search-active .modal {
-  transform: scale(1);
+  transform: scale(1) translateY(0);
   opacity: 1;
 }
 
 .modal.closing {
-  transform: scale(0);
+  transform: scale(0.8) translateY(-30px);
   opacity: 0;
+}
+
+/* 确保搜索模态框完全居中 */
+.search-pop-overlay .modal-dialog {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 100vh !important;
+  /* 占据全屏高度 */
+  width: 100vw !important;
+  /* 占据全屏宽度 */
+  margin: 0 !important;
+  padding: 1rem;
+  max-width: none !important;
+  /* 移除最大宽度限制 */
+  position: relative;
+}
+
+/* 搜索模态框内容容器 */
+.search-pop-overlay .modal-dialog .modal-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 600px;
+  /* 内容最大宽度 */
+  pointer-events: auto;
+  background-clip: padding-box;
+  outline: 0;
+  margin: 0 auto !important;
+  /* 额外的水平居中保证 */
+}
+
+/* 搜索框动画优化 */
+.search-pop-overlay .modal {
+  display: flex !important;
+  /* 覆盖Bootstrap的display:block */
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* 额外的居中保证 */
+@media (max-height: 600px) {
+  .search-pop-overlay {
+    align-items: flex-start;
+    padding-top: 2rem;
+  }
+}
+
+/* 超大屏幕优化 */
+@media (min-width: 1400px) {
+  .search-pop-overlay .modal {
+    max-width: 700px;
+  }
+}
+
+/* 移动端优化 */
+@media (max-width: 768px) {
+  .search-pop-overlay {
+    padding: 1rem;
+    align-items: center !important;
+    /* 确保移动端也垂直居中 */
+    justify-content: center !important;
+    /* 确保移动端也水平居中 */
+  }
+
+  .search-pop-overlay .modal {
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: none !important;
+    margin: 0 !important;
+    /* 确保没有额外的margin */
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+  }
+
+  .search-pop-overlay .modal-dialog {
+    margin: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: none !important;
+    justify-content: center !important;
+    padding: 1rem;
+  }
+
+  .search-pop-overlay .modal-content {
+    border-radius: 0.75rem;
+    border: none;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    margin: 0 auto !important;
+    max-width: 100%;
+    width: 100%;
+  }
+}
+
+/* 桌面端优化 */
+@media (min-width: 769px) {
+  .search-pop-overlay {
+    align-items: center !important;
+    /* 确保桌面端也垂直居中 */
+    justify-content: center !important;
+    /* 确保桌面端也水平居中 */
+  }
+
+  .search-pop-overlay .modal {
+    margin: 0 !important;
+    /* 确保没有额外的margin */
+    width: 100vw !important;
+    /* 占据全屏宽度 */
+    height: 100vh !important;
+    /* 占据全屏高度 */
+    max-width: none !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+  }
+
+  .search-pop-overlay .modal-dialog {
+    margin: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: none !important;
+    justify-content: center !important;
+    padding: 2rem;
+  }
+
+  .search-pop-overlay .modal-content {
+    border-radius: 1rem;
+    border: none;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    margin: 0 auto !important;
+    /* 强制水平居中 */
+    max-width: 600px;
+    width: 100%;
+  }
 }

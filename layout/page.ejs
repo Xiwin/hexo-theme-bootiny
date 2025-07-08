@@ -1,8 +1,24 @@
-<!-- 如果标题名为 page.title tags，那么就插入标签云 -->
+<!-- 如果标题名为 page.title tags，那么就插入标签云墙 -->
 <% if (page.title == 'tags') { %>
-<!-- 标签云 -->
-<div class="tag-cloud text-center">
-  <%- tagcloud() %>
+<!-- 标签云墙 - 蓝白配色 -->
+<div class="tag-wall-container">
+  <div class="tag-wall-header">
+    <h2 class="tag-wall-title">
+      <i class="bi bi-cloud-sun me-2"></i>
+      标签云墙
+      <span class="text-muted fs-6">（共 <%= site.tags.length %> 个标签）</span>
+    </h2>
+    <p class="tag-wall-subtitle">如蓝天白云般纯净美好的知识标签</p>
+  </div>
+
+  <div class="tag-wall">
+    <% site.tags.sort('name').each(function(tag) { %>
+    <a href="<%- url_for(tag.path) %>" class="tag-wall-item" data-count="<%= tag.posts.length %>" title="<%= tag.name %>（<%= tag.posts.length %> 篇文章）">
+      <%= tag.name %>
+      <span class="tag-count"><%= tag.posts.length %></span>
+    </a>
+    <% }); %>
+  </div>
 </div>
 <% } else { %>
 

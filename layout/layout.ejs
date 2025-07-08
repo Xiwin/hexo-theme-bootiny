@@ -25,6 +25,13 @@
 
   <title><%= title %></title>
   <meta name="author" content="<%- config.author %>">
+  <% if (is_post()) { %>
+  <meta name="description" content="<%- strip_html(page.excerpt || page.content).substring(0, 150) %>">
+  <% } else if (is_page()) { %>
+  <meta name="description" content="<%- strip_html(page.content).substring(0, 150) %>">
+  <% } else { %>
+  <meta name="description" content="<%- config.description %>">
+  <% } %>
 
   <!-- 自定义CSS样式 -->
   <%- css('css/custom') %>
@@ -61,53 +68,57 @@
   <!-- 横幅 -->
   <!-- partial('partial/banner') %> -->
 
-  <!-- 导航栏 -->
-  <header>
-    <%- partial('partial/header/navbar') %>
-  </header>
+  <div class="page-wrapper">
+    <!-- 导航栏 -->
+    <header>
+      <%- partial('partial/header/navbar') %>
+    </header>
 
-  <!-- 主题壁纸 -->
-  <%- partial('partial/particless') %>
+    <!-- 主题壁纸 -->
+    <%- partial('partial/particless') %>
 
-  <div class="container" style="height: 90px;">
+    <div class="container" style="height: 90px;">
 
-  </div>
+    </div>
 
-  <!-- 内容 -->
-  <div class=" container-fluid justify-content-around p-2">
-    <div class="row justify-content-center gx-2">
-      <!-- 个性化侧边框 -->
-      <aside class="col-xl-2 d-none d-lg-none d-xxl-block">
-        <%- partial('partial/aside/lsb') %>
-      </aside>
+    <!-- 内容 -->
+    <main class="main-content">
+      <div class="container-fluid justify-content-around p-2">
+        <div class="row justify-content-center gx-2">
+          <!-- 个性化侧边框 -->
+          <aside class="col-xl-2 d-none d-lg-none d-xxl-block">
+            <%- partial('partial/aside/lsb') %>
+          </aside>
 
-      <!-- 主体部分 -->
-      <div class="col-xl-8 col-12 col-xxl-6">
-        <div class="container rounded-4 p-4 shadow-lg blur">
-          <%- body %>
+          <!-- 主体部分 -->
+          <div class="col-xl-8 col-12 col-xxl-6">
+            <div class="container rounded-4 p-4 shadow-lg blur">
+              <%- body %>
+            </div>
+          </div>
+
+          <!-- 右侧边框 -->
+          <aside class="col-xl-2 d-none d-lg-none d-xl-block">
+            <%- partial('partial/aside/rsb') %>
+          </aside>
         </div>
       </div>
+    </main>
 
-      <!-- 右侧边框 -->
-      <aside class="col-xl-2 d-none d-lg-none d-xl-block">
-        <%- partial('partial/aside/rsb') %>
-      </aside>
-    </div>
+    <!-- 页脚 -->
+    <footer class="page-footer">
+      <%- partial('partial/footer/footer') %>
+    </footer>
   </div>
-
 
   <!-- 搜索拟态框 -->
   <%- partial('partial/search') %>
-
-  <!-- 页脚 -->
-  <footer>
-    <%- partial('partial/footer/footer') %>
-  </footer>
 
   <% if (is_post()) { %>
   <%- partial('partial/widget_overlay/widget_overlay') %>
   <script src="/js/gtop.js"></script>
   <% } %>
+  </div>
 
 </body>
 

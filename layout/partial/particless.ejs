@@ -3,9 +3,48 @@
 <div id="particles-js" class="wallpaper"></div>
 
 <script>
-  particlesJS.load('particles-js', '<%= theme.particles.conf_path  %>', () => {
-    console.log('callback - particles.js config loaded');
-  })
+  $(document).ready(function() {
+    // 检查是否为移动设备
+    const isMobile = window.innerWidth < 768;
+    const isTablet = window.innerWidth < 992;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // 移动端或低性能设备跳过粒子效果
+    if (isMobile || prefersReducedMotion) {
+      console.log('Skipping particles on mobile/reduced-motion device');
+      $('#particles-js').hide();
+      return;
+    }
+
+    // 根据设备调整粒子数量
+    let particleConfig = '<%= theme.particles.conf_path %>';
+
+    // 加载粒子配置
+    particlesJS.load('particles-js', particleConfig, function() {
+      console.log('Particles.js config loaded');
+
+      // 平板设备减少粒子数量
+      if (isTablet) {
+        if (window.pJSDom && window.pJSDom[0] && window.pJSDom[0].pJS) {
+          window.pJSDom[0].pJS.particles.number.value = Math.floor(window.pJSDom[0].pJS.particles.number.value * 0.6);
+          window.pJSDom[0].pJS.fn.particlesRefresh();
+        }
+      }
+    });
+
+    // 页面可见性API优化
+    document.addEventListener('visibilitychange', function() {
+      if (window.pJSDom && window.pJSDom[0] && window.pJSDom[0].pJS) {
+        if (document.hidden) {
+          // 页面隐藏时暂停动画
+          window.pJSDom[0].pJS.fn.vendors.destroypJS();
+        } else {
+          // 页面显示时重新启动
+          particlesJS.load('particles-js', particleConfig);
+        }
+      }
+    });
+  });
 </script>
 
 <% } %>

@@ -1,4 +1,4 @@
-<%- partial('partial/pagination', {type: 'page'}) %>
+<!-- 当前分类 -->
 
 <div style="max-width: 100%;">
   <% page.posts.forEach((post)=>{ %>
@@ -9,3 +9,5 @@
   </div>
   <% }); %>
 </div>
+
+<%- partial('partial/pagination', {type: 'page'}) %>
